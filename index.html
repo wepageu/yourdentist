@@ -25,6 +25,7 @@
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         /* ===== COLOR PALETTE ===== */
@@ -225,7 +226,7 @@
         }
 
         .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(10px, 10px);
+            transform: rotate(45deg) translate(5px, 6px);
         }
 
         .hamburger.active span:nth-child(2) {
@@ -233,7 +234,7 @@
         }
 
         .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
+            transform: rotate(-45deg) translate(5px, -6px);
         }
 
         /* ===== HERO SECTION ===== */
@@ -397,7 +398,7 @@
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
             gap: 2.5rem;
         }
 
@@ -853,61 +854,136 @@
                 background: white;
                 gap: 0;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
             }
 
             .nav-links.active {
                 display: flex;
             }
 
+            .nav-links li {
+                width: 100%;
+            }
+
             .nav-links a {
-                padding: 1rem;
+                padding: 1rem 1.5rem;
+                display: block;
                 border-bottom: 1px solid var(--light-gray);
+                font-size: 1rem;
             }
 
             .hamburger {
                 display: flex;
+                padding: 8px;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .hero {
+                padding-top: 120px;
+                padding-bottom: 60px;
             }
 
             .hero-content {
                 grid-template-columns: 1fr;
+                gap: 2rem;
             }
 
             .hero-text h1 {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
+                animation: none;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
             }
 
             .hero-buttons {
                 flex-direction: column;
+                gap: 0.75rem;
             }
 
             .btn {
                 width: 100%;
                 text-align: center;
+                padding: 0.9rem 1.5rem;
+                font-size: 0.95rem;
             }
 
             .trust-badges {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .hero-image .image-card {
+                aspect-ratio: 16/10;
+                border-radius: 15px;
+            }
+
+            .services {
+                padding: 60px 0;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .about {
+                padding: 60px 0;
             }
 
             .about-content,
             .appointment-content {
                 grid-template-columns: 1fr;
+                gap: 2rem;
             }
 
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .section-title {
+            .about-info h2 {
                 font-size: 2rem;
             }
 
-            .services-grid {
-                grid-template-columns: 1fr;
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
 
-            .hero-text h1 {
-                animation: none;
+            .section-title {
+                font-size: 1.8rem;
+                margin-bottom: 2rem;
+            }
+
+            .appointment {
+                padding: 60px 0;
+            }
+
+            .clinic-info {
+                padding: 1.5rem;
+            }
+
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                font-size: 16px; /* Prevents iOS zoom on focus */
+                padding: 0.75rem;
+            }
+
+            .faq {
+                padding: 60px 0;
+            }
+
+            .faq-question {
+                font-size: 0.9rem;
+                padding: 1.2rem;
+            }
+
+            footer {
+                padding: 2rem 0 1rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
 
             nav.scrolled {
@@ -916,24 +992,49 @@
         }
 
         @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .hero {
+                padding-top: 100px;
+                padding-bottom: 40px;
+            }
+
             .hero-text h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+
+            .hero-text .tagline-placeholder {
+                font-size: 0.95rem;
             }
 
             .section-title {
-                font-size: 1.75rem;
+                font-size: 1.5rem;
             }
 
-            .hero-buttons {
-                gap: 1rem;
+            .service-card h3 {
+                font-size: 1.2rem;
             }
 
-            .badge {
-                font-size: 0.85rem;
+            .service-card p {
+                font-size: 0.9rem;
+            }
+
+            .about-info h2 {
+                font-size: 1.6rem;
+            }
+
+            .about-info .doctor-name {
+                font-size: 1rem;
+            }
+
+            .about-info .credentials {
+                font-size: 0.9rem;
             }
 
             .stats {
-                gap: 1rem;
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .stat {
@@ -944,12 +1045,52 @@
                 font-size: 1.5rem;
             }
 
-            .about-info h2 {
-                font-size: 1.75rem;
+            .stat-label {
+                font-size: 0.8rem;
             }
 
-            .about-info .credentials {
+            .badge {
+                font-size: 0.85rem;
+            }
+
+            .btn-submit {
+                font-size: 0.95rem;
+            }
+
+            .info-item h3 {
                 font-size: 0.9rem;
+            }
+
+            .info-item p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Ensure touch-friendly tap targets */
+        @media (pointer: coarse) {
+            .btn {
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav-links a {
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+            }
+
+            .faq-question {
+                min-height: 48px;
+            }
+
+            .hamburger {
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
     </style>
