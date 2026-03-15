@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnhjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         * {
@@ -481,6 +481,109 @@
         .service-card p {
             color: #666;
             font-size: 0.95rem;
+        }
+
+        /* ===== SERVICES DROPDOWN ===== */
+        .services-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.3s ease;
+            background: white;
+            border-top: none;
+            grid-column: 1 / -1;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 10px 30px rgba(42, 158, 216, 0.1);
+            margin-top: -1rem;
+        }
+
+        .services-dropdown.active {
+            max-height: 800px;
+            border-top: 2px solid var(--sky-blue);
+        }
+
+        .services-dropdown-inner {
+            padding: 2rem;
+        }
+
+        .services-dropdown h4 {
+            color: var(--deep-navy);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .services-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .services-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1rem;
+            background: var(--light-gray);
+            border-radius: 8px;
+            color: var(--deep-navy);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .services-list li:hover {
+            background: var(--accent-blue);
+            color: var(--sky-blue);
+            transform: translateX(5px);
+        }
+
+        .services-list li::before {
+            content: '✓';
+            color: var(--sky-blue);
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .dropdown-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem auto 0;
+            padding: 0.5rem 1.5rem;
+            background: none;
+            border: 1px solid var(--sky-blue);
+            color: var(--sky-blue);
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-close:hover {
+            background: var(--sky-blue);
+            color: white;
+        }
+
+        .service-card.active-card {
+            border-color: var(--sky-blue);
+            box-shadow: 0 20px 50px rgba(42, 158, 216, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .services-list {
+                grid-template-columns: 1fr;
+            }
+
+            .services-dropdown-inner {
+                padding: 1.5rem;
+            }
         }
 
         /* ===== ABOUT SECTION ===== */
@@ -1127,7 +1230,7 @@
                 <p class="tagline-placeholder"><strong>Providing gentle, expert dental care for your brightest smile.</strong></p>
                 <div class="hero-buttons">
                     <button class="btn btn-primary" onclick="smoothScroll('appointment')">Book Appointment</button>
-                    <button class="btn btn-outline" onclick="smoothScroll('services')">Our Services</button>
+                    <button class="btn btn-outline" onclick="scrollAndOpenDropdown()">Our Services</button>
                 </div>
                 <div class="trust-badges">
                     <div class="badge"><i class="fas fa-check-circle"></i> Certified</div>
@@ -1137,7 +1240,7 @@
             </div>
             <div class="hero-image">
                 <div class="image-card">
-                    <img id="heroImage" src="WhatsApp Image.jpeg" alt="Dental clinic">
+                    <img id="heroImage" src="image 7.jpeg" alt="Dental clinic">
                 </div>
                 <div class="floating-badge">
                     ⭐ 5.0 Rating on Google
@@ -1429,9 +1532,32 @@
     }
 
     // ===== SERVICES INITIALIZATION =====
+    const ALL_SERVICES_LIST = [
+        "Dental Check-up",
+        "Teeth Cleaning (Scaling)",
+        "Tooth Filling",
+        "Root Canal Treatment (RCT)",
+        "Re-Root Canal Treatment",
+        "Dental Crown (Cap)",
+        "Dental Bridge",
+        "Tooth Extraction",
+        "Wisdom Tooth Removal",
+        "Teeth Whitening",
+        "Smile Designing",
+        "Gap Closure",
+        "Braces Treatment",
+        "Dental Implants",
+        "Dentures",
+        "Pediatric Dentistry",
+        "Gum Disease Treatment",
+        "Emergency Dental Care"
+    ];
+
     function initializeServices() {
         const servicesGrid = document.getElementById('servicesGrid');
-        servicesGrid.innerHTML = SERVICES.map((service, index) => {
+
+        // Build service cards
+        const cardsHTML = SERVICES.map((service, index) => {
             const illustration = service.image
                 ? `<img src="${service.image}" alt="${service.name}" style="width:100%;height:200px;object-fit:cover;display:block;">`
                 : `<div class="service-illustration">${SERVICE_SVGS[service.name] || ''}</div>`;
@@ -1445,14 +1571,67 @@
             </div>`;
         }).join('');
 
-        // Also populate form dropdown
+        // Build dropdown with full services list
+        const dropdownHTML = `
+        <div class="services-dropdown" id="servicesDropdown">
+            <div class="services-dropdown-inner">
+                <h4><i class="fas fa-list-check" style="color: var(--sky-blue);"></i> All Our Services</h4>
+                <ul class="services-list">
+                    ${ALL_SERVICES_LIST.map(s => `<li onclick="bookService('${s.replace(/'/g, "\\'")}')">${s}</li>`).join('')}
+                </ul>
+                <button class="dropdown-close" onclick="closeServicesDropdown()">
+                    <i class="fas fa-chevron-up" style="margin-right: 0.4rem;"></i> Close
+                </button>
+            </div>
+        </div>`;
+
+        servicesGrid.innerHTML = cardsHTML + dropdownHTML;
+
+        // Also populate form dropdown with full list
         const serviceSelect = document.getElementById('service');
-        SERVICES.forEach(service => {
+        ALL_SERVICES_LIST.forEach(service => {
             const option = document.createElement('option');
-            option.value = service.name;
-            option.textContent = service.name;
+            option.value = service;
+            option.textContent = service;
             serviceSelect.appendChild(option);
         });
+    }
+
+    function scrollAndOpenDropdown() {
+        const dropdown = document.getElementById('servicesDropdown');
+
+        // Scroll to services section first
+        smoothScroll('services');
+
+        // Open dropdown after scroll completes
+        setTimeout(() => {
+            if (!dropdown.classList.contains('active')) {
+                dropdown.classList.add('active');
+            }
+            // Scroll dropdown into view
+            setTimeout(() => {
+                dropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 300);
+        }, 600);
+    }
+
+    function closeServicesDropdown() {
+        const dropdown = document.getElementById('servicesDropdown');
+        dropdown.classList.remove('active');
+    }
+
+    function bookService(serviceName) {
+        // Navigate to appointment form and pre-select the service
+        const serviceSelect = document.getElementById('service');
+        // Find matching option
+        for (let i = 0; i < serviceSelect.options.length; i++) {
+            if (serviceSelect.options[i].value === serviceName) {
+                serviceSelect.selectedIndex = i;
+                break;
+            }
+        }
+        smoothScroll('appointment');
+        closeServicesDropdown();
     }
 
     // ===== UPDATE CLINIC INFO =====
